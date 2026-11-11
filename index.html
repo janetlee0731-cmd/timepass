@@ -38,14 +38,14 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 18px;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+      border-radius: 14px;
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.18);
       transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
     }
 
     .countdown-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+      transform: translateY(-1.5px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.26);
     }
 
     /* 自訂滾動條 */
@@ -63,38 +63,38 @@
   <!-- 容器限定最大寬度，確保在 Notion 內置欄位或全寬中均能完美呈現 -->
   <div id="widgetContainer" class="bg-aurora-wrapper w-full max-w-md min-h-screen flex flex-col relative z-10 pb-12 shadow-2xl">
 
-    <!-- 頂部導覽列：質感深綠色 (#0e382b) 白字 -->
-    <header class="bg-[#0e382b] text-white px-5 py-4 flex items-center justify-between sticky top-0 z-30 shadow-md border-b border-emerald-950/40">
-      <div class="flex items-center space-x-2">
-        <h1 class="text-2xl font-bold tracking-wide text-white">倒數與紀念</h1>
+    <!-- 頂部導覽列：質感深綠色 (#0e382b) 白字，字體縮小緊湊 -->
+    <header class="bg-[#0e382b] text-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 shadow-md border-b border-emerald-950/40">
+      <div class="flex items-center space-x-1.5">
+        <h1 class="text-[14px] font-bold tracking-wide text-white">倒數與紀念</h1>
       </div>
       
       <!-- 右側資訊與按鈕群 -->
-      <div class="flex items-center space-x-3 text-emerald-100">
-        <!-- 最後更新時間與刷新 -->
-        <button id="refreshBtn" title="點擊刷新" class="flex items-center space-x-1.5 hover:text-white transition-opacity active:opacity-70 group">
-          <span id="lastUpdatedText" class="text-sm font-medium text-emerald-100/90 group-hover:text-white">更新於 --/-- --:--</span>
-          <svg id="refreshIcon" class="w-4 h-4 transition-transform duration-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <div class="flex items-center space-x-2.5 text-emerald-100">
+        <!-- 最後更新時間與刷新 (微調為 11px) -->
+        <button id="refreshBtn" title="點擊刷新" class="flex items-center space-x-1 hover:text-white transition-opacity active:opacity-70 group">
+          <span id="lastUpdatedText" class="text-[11px] font-normal text-emerald-100/80 group-hover:text-white">更新於 --/-- --:--</span>
+          <svg id="refreshIcon" class="w-3.5 h-3.5 transition-transform duration-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         </button>
 
         <!-- 新增項目按鈕 (+) -->
-        <button id="openAddModalBtn" title="新增倒數項目" class="bg-white/15 hover:bg-white/25 active:bg-white/30 text-white rounded-full p-1.5 transition-all shadow-sm active:scale-95 flex items-center justify-center border border-white/20">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <button id="openAddModalBtn" title="新增倒數項目" class="bg-white/15 hover:bg-white/25 active:bg-white/30 text-white rounded-full p-1 transition-all shadow-sm active:scale-95 flex items-center justify-center border border-white/20">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
         </button>
       </div>
     </header>
 
-    <!-- 卡片列表區塊 -->
-    <main id="cardList" class="p-4 space-y-3.5 flex-1 relative z-10">
+    <!-- 卡片列表區塊：間距縮小為 2.5 -->
+    <main id="cardList" class="p-3.5 space-y-2.5 flex-1 relative z-10">
       <!-- 卡片由 JavaScript 動態生成渲染 -->
     </main>
 
-    <!-- 底部操作列：支援即時選取底圖與恢復預設 -->
-    <footer class="text-center py-3 text-xs text-emerald-200/70 font-medium space-x-4 flex justify-center items-center">
+    <!-- 底部操作列：文字調整為 11px -->
+    <footer class="text-center py-2.5 text-[11px] text-emerald-200/70 font-medium space-x-3 flex justify-center items-center">
       <label class="cursor-pointer hover:text-white transition-colors underline opacity-80 hover:opacity-100">
         更換底圖
         <input type="file" id="bgUploader" accept="image/*" class="hidden">
@@ -260,29 +260,29 @@
         }
 
         const card = document.createElement('div');
-        card.className = 'countdown-card px-5 py-4 flex items-center justify-between group';
+        card.className = 'countdown-card px-3.5 py-2.5 flex items-center justify-between group';
         card.innerHTML = `
-          <!-- 左側：標題與詳細中文日期 -->
-          <div class="flex-1 min-w-0 pr-3">
-            <h2 class="text-[21px] font-bold text-gray-800 leading-snug tracking-wide truncate">
+          <!-- 左側：標題 (13.5px) 與詳細中文日期 (10.5px) -->
+          <div class="flex-1 min-w-0 pr-2.5">
+            <h2 class="text-[13.5px] font-semibold text-gray-800 leading-snug tracking-normal truncate">
               ${escapeHtml(item.title)}
             </h2>
-            <div class="text-[13px] text-gray-400 font-normal mt-0.5 tracking-tight">
+            <div class="text-[10.5px] text-gray-400 font-normal mt-0.5 tracking-tight">
               ${formatChineseDate(item.date)}
             </div>
           </div>
 
-          <!-- 右側：大數字與標籤 -->
-          <div class="flex items-center space-x-2 flex-shrink-0">
-            <span class="text-[40px] font-bold text-[#2d3139] leading-none tracking-tight">
+          <!-- 右側：數字 (25px) 與標籤 (9.5px) -->
+          <div class="flex items-center space-x-1.5 flex-shrink-0">
+            <span class="text-[25px] font-bold text-[#2d3139] leading-none tracking-tight">
               ${displayCount}
             </span>
-            <span class="${badgeBg} text-white font-medium text-[13px] px-2 py-0.5 rounded-[6px] tracking-wide inline-block shadow-sm">
+            <span class="${badgeBg} text-white font-medium text-[9.5px] px-1.5 py-0.5 rounded-[4px] tracking-tight inline-block shadow-xs">
               ${badgeText}
             </span>
             <!-- 刪除按鈕 (微顯或滑鼠懸停顯示) -->
-            <button class="delete-btn ml-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 p-1 text-gray-400 hover:text-red-500 transition-opacity" data-id="${item.id}" data-name="${escapeHtml(item.title)}" title="刪除此項目">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <button class="delete-btn ml-0.5 opacity-0 group-hover:opacity-60 hover:!opacity-100 p-1 text-gray-400 hover:text-red-500 transition-opacity" data-id="${item.id}" data-name="${escapeHtml(item.title)}" title="刪除此項目">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
