@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>倒數與紀念 Notion 小工具</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 書法古風浮水印背景，復刻截圖質感 */
+    .bg-watermark {
+      background-color: #ede8df;
+      background-image: 
+        radial-gradient(circle at 70% 20%, rgba(200, 190, 175, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 20% 70%, rgba(190, 180, 165, 0.2) 0%, transparent 60%);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* 書法浮水印偽元素 */
+    .bg-watermark::before {
+      content: "期\A勝";
+      white-space: pre;
+      position: absolute;
+      top: 15%;
+      right: 15%;
+      font-size: 150px;
+      font-weight: 900;
+      line-height: 0.9;
+      color: rgba(60, 50, 40, 0.08);
+      font-family: "Kaiti TC", "KaiTi", "STKaiti", serif;
+      pointer-events: none;
+      z-index: 1;
+      transform: rotate(-3deg);
+    }
+
+    /* 印章紋理 */
+    .bg-watermark::after {
+      content: "";
+      position: absolute;
+      bottom: 22%;
+      right: 25%;
+      width: 48px;
+      height: 48px;
+      border: 2px solid rgba(210, 80, 70, 0.12);
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* 卡片陰影與過渡 */
+    .countdown-card {
+      position: relative;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 4px 15px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+    }
+
+    .countdown-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -3px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 自訂滾動條 */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.15);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-watermark min-h-screen text-slate-800 flex flex-col items-center">
+
+  <!-- 容器限定最大寬度，確保在 Notion 內置欄位或全寬中均能完美呈現 -->
+  <div class="w-full max-w-md min-h-screen flex flex-col relative z-10 pb-12 shadow-2xl bg-watermark">
+
+    <!-- 頂部導覽列：綠松石色/青綠色 (#0fb5a8) -->
+    <header class="bg-[#0fb5a8] text-white px-5 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+      <div class="flex items-center space-x-2">
+        <h1 class="text-2xl font-bold tracking-wide">倒數與紀念</h1>
+      </div>
+      
+      <!-- 右側資訊與按鈕群 -->
+      <div class="flex items-center space-x-3 text-white/90">
+        <!-- 最後更新時間與刷新 -->
+        <button id="refreshBtn" title="點擊刷新" class="flex items-center space-x-1 hover:text-white transition-opacity active:opacity-70 group">
+          <span id="lastUpdatedText" class="text-sm font-medium">更新於 --/-- --:--</span>
+          <svg id="refreshIcon" class="w-4 h-4 transition-transform duration-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+
+        <!-- 新增項目按鈕 (+) -->
+        <button id="openAddModalBtn" title="新增倒數項目" class="bg-white/20 hover:bg-white/30 text-white rounded-full p-1.5 transition-all shadow-sm active:scale-95 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 卡片列表區塊 -->
+    <main id="cardList" class="p-4 space-y-3.5 flex-1 relative z-10">
+      <!-- 卡片由 JavaScript 動態生成渲染 -->
+    </main>
+
+    <!-- 底部重置與說明按鈕 -->
+    <footer class="text-center py-2 text-xs text-stone-500 font-medium">
+      <button id="resetDefaultBtn" class="hover:underline opacity-60 hover:opacity-100 transition-opacity">恢復預設範例</button>
+    </footer>
+
+  </div>
+
+  <!-- 新增倒數項目 Modal 彈窗 -->
+  <div id="addModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity duration-200">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl transform transition-all scale-95 opacity-0 duration-200" id="modalBox">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-gray-800">新增倒數 / 紀念</h3>
+        <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form id="addForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">事件名稱</label>
+          <input type="text" id="eventName" required placeholder="例如：期末考、生日、旅行" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0fb5a8] text-sm text-gray-800 transition" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">目標日期</label>
+          <input type="date" id="eventDate" required class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0fb5a8] text-sm text-gray-800 transition" />
+        </div>
+
+        <div class="flex space-x-3 pt-2">
+          <button type="button" id="cancelModalBtn" class="w-1/2 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition">
+            取消
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-[#0fb5a8] text-white font-medium text-sm hover:bg-[#0da094] transition shadow-md">
+            建立
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 刪除確認用浮動對話框 (避免使用原生 confirm) -->
+  <div id="deleteModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-xs p-5 shadow-2xl text-center space-y-3">
+      <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 mx-auto flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </div>
+      <h4 class="font-bold text-gray-800">確定刪除此項目？</h4>
+      <p id="deleteTargetName" class="text-xs text-gray-500 truncate px-2"></p>
+      <div class="flex space-x-2 pt-2">
+        <button id="cancelDeleteBtn" class="w-1/2 py-2 rounded-xl border border-gray-200 text-gray-600 text-xs font-semibold hover:bg-gray-50">取消</button>
+        <button id="confirmDeleteBtn" class="w-1/2 py-2 rounded-xl bg-red-500 text-white text-xs font-semibold hover:bg-red-600 shadow-sm">確認刪除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 預設截圖資料模板
+    const defaultData = [
+      { id: '1', title: '研究所考試', date: '2027-02-01' },
+      { id: '2', title: '回家', date: getTodayString() },
+      { id: '3', title: '履歷', date: '2026-11-23' }
+    ];
+
+    const STORAGE_KEY = 'notion_countdown_items_data_v1';
+    let countdownList = [];
+    let pendingDeleteId = null;
+
+    // 取得當前日期的 YYYY-MM-DD 格式
+    function getTodayString() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    // 初始化載入
+    function init() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          countdownList = JSON.parse(saved);
+        } catch (e) {
+          countdownList = defaultData;
+        }
+      } else {
+        countdownList = defaultData;
+      }
+      render();
+      updateTimestamp();
+    }
+
+    // 儲存至 LocalStorage
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(countdownList));
+    }
+
+    // 格式化日期：例如 2027年2月1日 週一
+    function formatChineseDate(dateStr) {
+      const parts = dateStr.split('-');
+      if (parts.length < 3) return dateStr;
+      
+      const target = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      const year = target.getFullYear();
+      const month = target.getMonth() + 1;
+      const day = target.getDate();
+      const weekdays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+      const weekName = weekdays[target.getDay()];
+
+      return `${year}年${month}月${day}日 ${weekName}`;
+    }
+
+    // 計算剩餘天數 (依整日計算)
+    function calculateDays(dateStr) {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      
+      const parts = dateStr.split('-');
+      const target = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10)).getTime();
+      
+      const diffTime = target - today;
+      return Math.round(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    // 畫面渲染
+    function render() {
+      const container = document.getElementById('cardList');
+      container.innerHTML = '';
+
+      if (countdownList.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-16 text-stone-400">
+            <p class="text-sm">目前無任何倒數或紀念事件</p>
+            <p class="text-xs mt-1">點擊右上角「+」立即新增</p>
+          </div>
+        `;
+        return;
+      }
+
+      countdownList.forEach(item => {
+        const diffDays = calculateDays(item.date);
+        
+        // 樣式判斷：天數大於0為「天後」(青綠)，等於0為「天」(粉紅)，小於0為「天前」(灰)
+        let badgeText = '天後';
+        let badgeBg = 'bg-[#2bb5a8]'; // 截圖青綠色
+        let displayCount = diffDays;
+
+        if (diffDays === 0) {
+          badgeText = '天';
+          badgeBg = 'bg-[#e56363]'; // 截圖粉紅色
+          displayCount = 0;
+        } else if (diffDays < 0) {
+          badgeText = '天前';
+          badgeBg = 'bg-stone-400';
+          displayCount = Math.abs(diffDays);
+        }
+
+        const card = document.createElement('div');
+        card.className = 'countdown-card px-5 py-4 flex items-center justify-between group';
+        card.innerHTML = `
+          <!-- 左側：標題與詳細中文日期 -->
+          <div class="flex-1 min-w-0 pr-3">
+            <h2 class="text-[21px] font-bold text-gray-800 leading-snug tracking-wide truncate">
+              ${escapeHtml(item.title)}
+            </h2>
+            <div class="text-[13px] text-gray-400 font-normal mt-0.5 tracking-tight">
+              ${formatChineseDate(item.date)}
+            </div>
+          </div>
+
+          <!-- 右側：大數字與標籤 -->
+          <div class="flex items-center space-x-2 flex-shrink-0">
+            <span class="text-[40px] font-bold text-[#2d3139] leading-none tracking-tight">
+              ${displayCount}
+            </span>
+            <span class="${badgeBg} text-white font-medium text-[13px] px-2 py-0.5 rounded-[6px] tracking-wide inline-block shadow-sm">
+              ${badgeText}
+            </span>
+            <!-- 刪除按鈕 (微顯或滑鼠懸停顯示) -->
+            <button class="delete-btn ml-1 opacity-0 group-hover:opacity-60 hover:!opacity-100 p-1 text-gray-400 hover:text-red-500 transition-opacity" data-id="${item.id}" data-name="${escapeHtml(item.title)}" title="刪除此項目">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      // 綁定卡片刪除事件
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.getAttribute('data-id');
+          const name = btn.getAttribute('data-name');
+          openDeleteModal(id, name);
+        });
+      });
+    }
+
+    // 轉義字符防止 XSS
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[m];
+      });
+    }
+
+    // 更新頂部「更新於 MM/DD HH:mm」
+    function updateTimestamp() {
+      const now = new Date();
+      const m = now.getMonth() + 1;
+      const d = now.getDate();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('lastUpdatedText').textContent = `更新於${m}/${d} ${hh}:${mm}`;
+    }
+
+    // 重新整理動作
+    const refreshBtn = document.getElementById('refreshBtn');
+    const refreshIcon = document.getElementById('refreshIcon');
+    refreshBtn.addEventListener('click', () => {
+      refreshIcon.classList.add('rotate-180');
+      setTimeout(() => {
+        refreshIcon.classList.remove('rotate-180');
+      }, 500);
+      updateTimestamp();
+      render();
+    });
+
+    // Modal 打開 / 關閉邏輯
+    const addModal = document.getElementById('addModal');
+    const modalBox = document.getElementById('modalBox');
+    const openAddModalBtn = document.getElementById('openAddModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    const addForm = document.getElementById('addForm');
+    const eventDateInput = document.getElementById('eventDate');
+
+    function openModal() {
+      eventDateInput.value = getTodayString();
+      addModal.classList.remove('hidden');
+      setTimeout(() => {
+        modalBox.classList.remove('scale-95', 'opacity-0');
+        modalBox.classList.add('scale-100', 'opacity-100');
+      }, 10);
+    }
+
+    function closeModal() {
+      modalBox.classList.remove('scale-100', 'opacity-100');
+      modalBox.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        addModal.classList.add('hidden');
+        addForm.reset();
+      }, 200);
+    }
+
+    openAddModalBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelModalBtn.addEventListener('click', closeModal);
+
+    // 新增提交
+    addForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('eventName').value.trim();
+      const date = document.getElementById('eventDate').value;
+      if (!name || !date) return;
+
+      countdownList.unshift({
+        id: Date.now().toString(),
+        title: name,
+        date: date
+      });
+
+      saveData();
+      render();
+      closeModal();
+    });
+
+    // 刪除對話框邏輯
+    const deleteModal = document.getElementById('deleteModal');
+    const deleteTargetName = document.getElementById('deleteTargetName');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+    function openDeleteModal(id, name) {
+      pendingDeleteId = id;
+      deleteTargetName.textContent = name;
+      deleteModal.classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+      pendingDeleteId = null;
+      deleteModal.classList.add('hidden');
+    }
+
+    cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+    confirmDeleteBtn.addEventListener('click', () => {
+      if (pendingDeleteId) {
+        countdownList = countdownList.filter(item => item.id !== pendingDeleteId);
+        saveData();
+        render();
+      }
+      closeDeleteModal();
+    });
+
+    // 恢復預設範例按鈕
+    document.getElementById('resetDefaultBtn').addEventListener('click', () => {
+      countdownList = [
+        { id: '1', title: '研究所考試', date: '2027-02-01' },
+        { id: '2', title: '回家', date: getTodayString() },
+        { id: '3', title: '履歷', date: '2026-11-23' }
+      ];
+      saveData();
+      render();
+      updateTimestamp();
+    });
+
+    // 頁面初次載入
+    window.onload = function() {
+      init();
+    };
+  </script>
+</body>
+</html>
