@@ -16,62 +16,36 @@
       font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
+      background-color: #061914;
     }
 
-    /* 書法古風浮水印背景，復刻截圖質感 */
-    .bg-watermark {
-      background-color: #ede8df;
-      background-image: 
-        radial-gradient(circle at 70% 20%, rgba(200, 190, 175, 0.25) 0%, transparent 60%),
-        radial-gradient(circle at 20% 70%, rgba(190, 180, 165, 0.2) 0%, transparent 60%);
+    /* 極光全圖背景：以 100% 寬度呈現整張照片，不局部放大、不裁切比例 */
+    .bg-aurora-wrapper {
+      background-color: #061914; /* 與極光下半部峽谷岩石融合的夜幕深墨綠色 */
+      background-image: url('極光.jpg');
+      background-repeat: no-repeat;
+      background-position: top center;
+      background-size: 100% auto; /* 完整呈現照片整體寬高 */
+      min-height: 100vh;
       position: relative;
-      overflow-x: hidden;
     }
 
-    /* 書法浮水印偽元素 */
-    .bg-watermark::before {
-      content: "期\A勝";
-      white-space: pre;
-      position: absolute;
-      top: 15%;
-      right: 15%;
-      font-size: 150px;
-      font-weight: 900;
-      line-height: 0.9;
-      color: rgba(60, 50, 40, 0.08);
-      font-family: "Kaiti TC", "KaiTi", "STKaiti", serif;
-      pointer-events: none;
-      z-index: 1;
-      transform: rotate(-3deg);
-    }
-
-    /* 印章紋理 */
-    .bg-watermark::after {
-      content: "";
-      position: absolute;
-      bottom: 22%;
-      right: 25%;
-      width: 48px;
-      height: 48px;
-      border: 2px solid rgba(210, 80, 70, 0.12);
-      border-radius: 8px;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* 卡片陰影與過渡 */
+    /* 倒數卡片：半透明毛玻璃質感，在極光背景下層次清晰 */
     .countdown-card {
       position: relative;
       z-index: 10;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
-      box-shadow: 0 4px 15px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
       transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
     }
 
     .countdown-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px -3px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
     }
 
     /* 自訂滾動條 */
@@ -79,34 +53,34 @@
       width: 4px;
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(0,0,0,0.15);
+      background: rgba(255,255,255,0.2);
       border-radius: 4px;
     }
   </style>
 </head>
-<body class="bg-watermark min-h-screen text-slate-800 flex flex-col items-center">
+<body class="bg-[#061914] min-h-screen text-slate-800 flex flex-col items-center justify-start">
 
   <!-- 容器限定最大寬度，確保在 Notion 內置欄位或全寬中均能完美呈現 -->
-  <div class="w-full max-w-md min-h-screen flex flex-col relative z-10 pb-12 shadow-2xl bg-watermark">
+  <div id="widgetContainer" class="bg-aurora-wrapper w-full max-w-md min-h-screen flex flex-col relative z-10 pb-12 shadow-2xl">
 
-    <!-- 頂部導覽列：綠松石色/青綠色 (#0fb5a8) -->
-    <header class="bg-[#0fb5a8] text-white px-5 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+    <!-- 頂部導覽列：質感深綠色 (#0e382b) 白字 -->
+    <header class="bg-[#0e382b] text-white px-5 py-4 flex items-center justify-between sticky top-0 z-30 shadow-md border-b border-emerald-950/40">
       <div class="flex items-center space-x-2">
-        <h1 class="text-2xl font-bold tracking-wide">倒數與紀念</h1>
+        <h1 class="text-2xl font-bold tracking-wide text-white">倒數與紀念</h1>
       </div>
       
       <!-- 右側資訊與按鈕群 -->
-      <div class="flex items-center space-x-3 text-white/90">
+      <div class="flex items-center space-x-3 text-emerald-100">
         <!-- 最後更新時間與刷新 -->
-        <button id="refreshBtn" title="點擊刷新" class="flex items-center space-x-1 hover:text-white transition-opacity active:opacity-70 group">
-          <span id="lastUpdatedText" class="text-sm font-medium">更新於 --/-- --:--</span>
+        <button id="refreshBtn" title="點擊刷新" class="flex items-center space-x-1.5 hover:text-white transition-opacity active:opacity-70 group">
+          <span id="lastUpdatedText" class="text-sm font-medium text-emerald-100/90 group-hover:text-white">更新於 --/-- --:--</span>
           <svg id="refreshIcon" class="w-4 h-4 transition-transform duration-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         </button>
 
         <!-- 新增項目按鈕 (+) -->
-        <button id="openAddModalBtn" title="新增倒數項目" class="bg-white/20 hover:bg-white/30 text-white rounded-full p-1.5 transition-all shadow-sm active:scale-95 flex items-center justify-center">
+        <button id="openAddModalBtn" title="新增倒數項目" class="bg-white/15 hover:bg-white/25 active:bg-white/30 text-white rounded-full p-1.5 transition-all shadow-sm active:scale-95 flex items-center justify-center border border-white/20">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
@@ -119,15 +93,20 @@
       <!-- 卡片由 JavaScript 動態生成渲染 -->
     </main>
 
-    <!-- 底部重置與說明按鈕 -->
-    <footer class="text-center py-2 text-xs text-stone-500 font-medium">
-      <button id="resetDefaultBtn" class="hover:underline opacity-60 hover:opacity-100 transition-opacity">恢復預設範例</button>
+    <!-- 底部操作列：支援即時選取底圖與恢復預設 -->
+    <footer class="text-center py-3 text-xs text-emerald-200/70 font-medium space-x-4 flex justify-center items-center">
+      <label class="cursor-pointer hover:text-white transition-colors underline opacity-80 hover:opacity-100">
+        更換底圖
+        <input type="file" id="bgUploader" accept="image/*" class="hidden">
+      </label>
+      <span>•</span>
+      <button id="resetDefaultBtn" class="hover:underline opacity-80 hover:opacity-100 transition-opacity hover:text-white">恢復預設範例</button>
     </footer>
 
   </div>
 
   <!-- 新增倒數項目 Modal 彈窗 -->
-  <div id="addModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity duration-200">
+  <div id="addModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity duration-200">
     <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl transform transition-all scale-95 opacity-0 duration-200" id="modalBox">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-bold text-gray-800">新增倒數 / 紀念</h3>
@@ -141,19 +120,19 @@
       <form id="addForm" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">事件名稱</label>
-          <input type="text" id="eventName" required placeholder="例如：期末考、生日、旅行" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0fb5a8] text-sm text-gray-800 transition" />
+          <input type="text" id="eventName" required placeholder="例如：期末考、生日、旅行" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#123b30] text-sm text-gray-800 transition" />
         </div>
 
         <div>
           <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">目標日期</label>
-          <input type="date" id="eventDate" required class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0fb5a8] text-sm text-gray-800 transition" />
+          <input type="date" id="eventDate" required class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#123b30] text-sm text-gray-800 transition" />
         </div>
 
         <div class="flex space-x-3 pt-2">
           <button type="button" id="cancelModalBtn" class="w-1/2 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition">
             取消
           </button>
-          <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-[#0fb5a8] text-white font-medium text-sm hover:bg-[#0da094] transition shadow-md">
+          <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-[#123b30] text-white font-medium text-sm hover:bg-[#0c2a22] transition shadow-md">
             建立
           </button>
         </div>
@@ -447,9 +426,43 @@
       updateTimestamp();
     });
 
+    // 本地底圖讀取支援 (可即時上傳預覽或自動加載極光.jpg)
+    const bgUploader = document.getElementById('bgUploader');
+    const widgetContainer = document.getElementById('widgetContainer');
+    const BG_STORAGE_KEY = 'notion_countdown_custom_bg';
+
+    function initBackground() {
+      const savedBg = localStorage.getItem(BG_STORAGE_KEY);
+      if (savedBg) {
+        widgetContainer.style.backgroundImage = `url(${savedBg})`;
+      } else {
+        widgetContainer.style.backgroundImage = "url('極光.jpg')";
+      }
+    }
+
+    if (bgUploader) {
+      bgUploader.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            const dataUrl = evt.target.result;
+            try {
+              localStorage.setItem(BG_STORAGE_KEY, dataUrl);
+            } catch (err) {
+              // 超過儲存空間時僅當前工作階段呈現
+            }
+            widgetContainer.style.backgroundImage = `url(${dataUrl})`;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
     // 頁面初次載入
     window.onload = function() {
       init();
+      initBackground();
     };
   </script>
 </body>
