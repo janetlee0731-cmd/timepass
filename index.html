@@ -30,17 +30,35 @@
       position: relative;
     }
 
+    /* 底部垂直暗部漸層遮罩，讓照片下緣與夜幕深墨綠底色自然融合 */
+    .bg-aurora-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(6, 25, 20, 0.05) 0%,
+        rgba(6, 25, 20, 0.18) 55%,
+        rgba(6, 25, 20, 0.85) 85%,
+        #061914 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
     /* 倒數卡片：半透明毛玻璃質感，在極光背景下層次清晰 */
     .countdown-card {
       position: relative;
       z-index: 10;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 14px;
-      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.18);
-      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+      cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, background-color 0.2s ease;
     }
 
     .countdown-card:hover {
@@ -63,31 +81,31 @@
   <!-- 容器限定最大寬度，確保在 Notion 內置欄位或全寬中均能完美呈現 -->
   <div id="widgetContainer" class="bg-aurora-wrapper w-full max-w-md min-h-screen flex flex-col relative z-10 pb-12 shadow-2xl">
 
-    <!-- 頂部導覽列：質感深綠色 (#0e382b) 白字，字體縮小緊湊 -->
-    <header class="bg-[#0e382b] text-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 shadow-md border-b border-emerald-950/40">
-      <div class="flex items-center space-x-1.5">
-        <h1 class="text-[14px] font-bold tracking-wide text-white">倒數與紀念</h1>
-      </div>
+    <!-- 頂部導覽列：質感深綠色 (#0e382b) 白字，左上角放置新增 (+) 按鈕 -->
+    <header class="bg-[#0e382b] text-white px-3.5 py-2.5 flex items-center justify-between sticky top-0 z-30 shadow-md border-b border-emerald-950/40">
+      <!-- 左側：新增項目按鈕 (+) -->
+      <button id="openAddModalBtn" title="新增倒數項目" class="w-6 h-6 rounded-full hover:bg-white/15 active:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95">
+        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+      </button>
       
-      <!-- 右側資訊與按鈕群 -->
-      <div class="flex items-center space-x-2.5 text-emerald-100">
-        <!-- 最後更新時間與刷新 (微調為 11px) -->
-        <button id="refreshBtn" title="點擊刷新" class="flex items-center space-x-1 hover:text-white transition-opacity active:opacity-70 group">
-          <span id="lastUpdatedText" class="text-[11px] font-normal text-emerald-100/80 group-hover:text-white">更新於 --/-- --:--</span>
-          <svg id="refreshIcon" class="w-3.5 h-3.5 transition-transform duration-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        </button>
-
-        <!-- 新增項目按鈕 (+) -->
-        <button id="openAddModalBtn" title="新增倒數項目" class="bg-white/15 hover:bg-white/25 active:bg-white/30 text-white rounded-full p-1 transition-all shadow-sm active:scale-95 flex items-center justify-center border border-white/20">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-        </button>
-      </div>
+      <!-- 右側：最後更新時間與刷新按鈕 -->
+      <button id="refreshBtn" title="點擊刷新" class="flex items-center space-x-1.5 text-[rgba(255,255,255,0.85)] hover:text-white transition-opacity active:opacity-70 group">
+        <span id="lastUpdatedText" class="text-[11px] font-normal tracking-tight">更新於 --/-- --:--</span>
+        <svg id="refreshIcon" class="w-[14px] h-[14px] transition-transform duration-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      </button>
     </header>
 
+    <!-- 卡片列表區塊：間距縮小為 2.5 -->
+    <main id="cardList" class="p-3 space-y-2.5 flex-1 relative z-10">
+      <!-- 卡片由 JavaScript 動態生成渲染 -->
+    </main>
+
+    <!-- 底部操作列：文字調整為 11px -->
+    <footer class="relative z-10 text-center py-2.5 text-[11px] text-emerald-200/70 font-medium space-x-3 flex justify-center items-center">
     <!-- 卡片列表區塊：間距縮小為 2.5 -->
     <main id="cardList" class="p-3.5 space-y-2.5 flex-1 relative z-10">
       <!-- 卡片由 JavaScript 動態生成渲染 -->
@@ -109,7 +127,7 @@
   <div id="addModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity duration-200">
     <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl transform transition-all scale-95 opacity-0 duration-200" id="modalBox">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold text-gray-800">新增倒數 / 紀念</h3>
+        <h3 id="modalTitle" class="text-lg font-bold text-gray-800">新增倒數 / 紀念</h3>
         <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 p-1">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -132,7 +150,7 @@
           <button type="button" id="cancelModalBtn" class="w-1/2 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition">
             取消
           </button>
-          <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-[#123b30] text-white font-medium text-sm hover:bg-[#0c2a22] transition shadow-md">
+          <button type="submit" id="modalSubmitBtn" class="w-1/2 py-2.5 rounded-xl bg-[#123b30] text-white font-medium text-sm hover:bg-[#0c2a22] transition shadow-md">
             建立
           </button>
         </div>
@@ -161,13 +179,14 @@
     // 預設截圖資料模板
     const defaultData = [
       { id: '1', title: '研究所考試', date: '2027-02-01' },
-      { id: '2', title: '回家', date: getTodayString() },
+      { id: '2', title: '回家', date: '2026-11-12' },
       { id: '3', title: '履歷', date: '2026-11-23' }
     ];
 
     const STORAGE_KEY = 'notion_countdown_items_data_v1';
     let countdownList = [];
     let pendingDeleteId = null;
+    let editingItemId = null;
 
     // 取得當前日期的 YYYY-MM-DD 格式
     function getTodayString() {
@@ -246,48 +265,55 @@
         
         // 樣式判斷：天數大於0為「天後」(青綠)，等於0為「天」(粉紅)，小於0為「天前」(灰)
         let badgeText = '天後';
-        let badgeBg = 'bg-[#2bb5a8]'; // 截圖青綠色
+        let badgeBg = 'bg-[#1fb6aa]';
         let displayCount = diffDays;
 
         if (diffDays === 0) {
           badgeText = '天';
-          badgeBg = 'bg-[#e56363]'; // 截圖粉紅色
+          badgeBg = 'bg-[#ef6b6b]';
           displayCount = 0;
         } else if (diffDays < 0) {
           badgeText = '天前';
-          badgeBg = 'bg-stone-400';
+          badgeBg = 'bg-[#64748b]';
           displayCount = Math.abs(diffDays);
         }
 
         const card = document.createElement('div');
-        card.className = 'countdown-card px-3.5 py-2.5 flex items-center justify-between group';
+        card.className = 'countdown-card flex items-center justify-between group';
+        card.title = '點擊編輯此項目';
         card.innerHTML = `
           <!-- 左側：標題 (13.5px) 與詳細中文日期 (10.5px) -->
           <div class="flex-1 min-w-0 pr-2.5">
-            <h2 class="text-[13.5px] font-semibold text-gray-800 leading-snug tracking-normal truncate">
+            <h2 class="text-[13.5px] font-semibold text-[#1f2937] leading-snug tracking-normal truncate">
               ${escapeHtml(item.title)}
             </h2>
-            <div class="text-[10.5px] text-gray-400 font-normal mt-0.5 tracking-tight">
+            <div class="text-[10.5px] text-[#6b7280] font-normal mt-0.5 tracking-tight">
               ${formatChineseDate(item.date)}
             </div>
           </div>
 
-          <!-- 右側：數字 (25px) 與標籤 (9.5px) -->
-          <div class="flex items-center space-x-1.5 flex-shrink-0">
-            <span class="text-[25px] font-bold text-[#2d3139] leading-none tracking-tight">
+          <!-- 右側：數字 (25px) 與狀態標籤 (9.5px) -->
+          <div class="flex items-start space-x-1.5 flex-shrink-0 pr-2">
+            <span class="text-[25px] font-bold text-[#374151] tabular-nums leading-none tracking-tight">
               ${displayCount}
             </span>
-            <span class="${badgeBg} text-white font-medium text-[9.5px] px-1.5 py-0.5 rounded-[4px] tracking-tight inline-block shadow-xs">
+            <span class="${badgeBg} text-white font-medium text-[9.5px] px-2 py-0.5 rounded-[4px] leading-tight -mt-0.5 tracking-tight inline-block">
               ${badgeText}
             </span>
-            <!-- 刪除按鈕 (微顯或滑鼠懸停顯示) -->
-            <button class="delete-btn ml-0.5 opacity-0 group-hover:opacity-60 hover:!opacity-100 p-1 text-gray-400 hover:text-red-500 transition-opacity" data-id="${item.id}" data-name="${escapeHtml(item.title)}" title="刪除此項目">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </div>
+
+          <!-- 右上角懸停刪除按鈕 (×) -->
+          <button class="delete-btn absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-75 hover:!opacity-100 p-0.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-gray-100/80 transition-all" data-id="${item.id}" data-name="${escapeHtml(item.title)}" title="刪除此項目">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         `;
+
+        // 點擊卡片可編輯標題與日期
+        card.addEventListener('click', () => {
+          openEditModal(item);
+        });
 
         container.appendChild(card);
       });
@@ -341,14 +367,34 @@
     // Modal 打開 / 關閉邏輯
     const addModal = document.getElementById('addModal');
     const modalBox = document.getElementById('modalBox');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalSubmitBtn = document.getElementById('modalSubmitBtn');
     const openAddModalBtn = document.getElementById('openAddModalBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const cancelModalBtn = document.getElementById('cancelModalBtn');
     const addForm = document.getElementById('addForm');
+    const eventNameInput = document.getElementById('eventName');
     const eventDateInput = document.getElementById('eventDate');
 
     function openModal() {
+      editingItemId = null;
+      modalTitle.textContent = '新增倒數 / 紀念';
+      modalSubmitBtn.textContent = '建立';
+      eventNameInput.value = '';
       eventDateInput.value = getTodayString();
+      addModal.classList.remove('hidden');
+      setTimeout(() => {
+        modalBox.classList.remove('scale-95', 'opacity-0');
+        modalBox.classList.add('scale-100', 'opacity-100');
+      }, 10);
+    }
+
+    function openEditModal(item) {
+      editingItemId = item.id;
+      modalTitle.textContent = '編輯倒數 / 紀念';
+      modalSubmitBtn.textContent = '儲存';
+      eventNameInput.value = item.title;
+      eventDateInput.value = item.date;
       addModal.classList.remove('hidden');
       setTimeout(() => {
         modalBox.classList.remove('scale-95', 'opacity-0');
@@ -362,6 +408,7 @@
       setTimeout(() => {
         addModal.classList.add('hidden');
         addForm.reset();
+        editingItemId = null;
       }, 200);
     }
 
@@ -369,18 +416,24 @@
     closeModalBtn.addEventListener('click', closeModal);
     cancelModalBtn.addEventListener('click', closeModal);
 
-    // 新增提交
+    // 新增或編輯提交
     addForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = document.getElementById('eventName').value.trim();
-      const date = document.getElementById('eventDate').value;
+      const name = eventNameInput.value.trim();
+      const date = eventDateInput.value;
       if (!name || !date) return;
 
-      countdownList.unshift({
-        id: Date.now().toString(),
-        title: name,
-        date: date
-      });
+      if (editingItemId) {
+        countdownList = countdownList.map(item =>
+          item.id === editingItemId ? { ...item, title: name, date: date } : item
+        );
+      } else {
+        countdownList.unshift({
+          id: Date.now().toString(),
+          title: name,
+          date: date
+        });
+      }
 
       saveData();
       render();
@@ -418,7 +471,7 @@
     document.getElementById('resetDefaultBtn').addEventListener('click', () => {
       countdownList = [
         { id: '1', title: '研究所考試', date: '2027-02-01' },
-        { id: '2', title: '回家', date: getTodayString() },
+        { id: '2', title: '回家', date: '2026-11-12' },
         { id: '3', title: '履歷', date: '2026-11-23' }
       ];
       saveData();
